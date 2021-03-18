@@ -52,7 +52,7 @@ router.post("/authenticate", async (req, res) => {
       return res.status(400).send({ error: "Senha inválida" });
     }
 
-    user.password = undefined;   
+    user.password = undefined;// para não exibir a senha no retorno da req   
     return res.send({ 
       user, 
       token: generateToken({ id: user.id }),
