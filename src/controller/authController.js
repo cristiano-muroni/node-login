@@ -21,7 +21,7 @@ router.post("/registro", async (req, res) => {
 
     user.password = undefined;
 
-    return res.send({ user, token: generateToken({ id: user.id }) });
+    return res.send({ user, token: generateToken({ id: user.id }), });
   } catch (err) {
     return res.status(400).send({ error: "Falha ao registrar usuário" });
   }
@@ -30,12 +30,19 @@ router.post("/registro", async (req, res) => {
 router.post("/authenticate", async (req, res) => {
   try {
     const { email, password } = req.body;
-    const user =  await User.findOne({email})
-    console.log('user', user);
 
-   // const secretPassword = await user.select('+passord'); 
-    //console.log(secretPassword);
-   
+    const userProps = [
+      "name",
+      "email",
+      "password",
+      "businessOwner",
+      "createdAt",
+    ]; // array de propriedades a retornar no objeto de usuário
+
+    const user = await User.findOne({ email }) // Tua classe de acesso ao banco // consulta filtrada por email
+      .select(userProps); // selecionando os campos que queremos
+
+    console.log("user", user);
 
     if (!user) {
       return res.status(400).send({ error: "Usuário não encontrado" });
@@ -43,13 +50,17 @@ router.post("/authenticate", async (req, res) => {
 
     if (!(await bcrypt.compare(password, user.password))) {
       return res.status(400).send({ error: "Senha inválida" });
-      user.password = undefined;
-
-      return res.json({ user, token: generateToken({ id: user.id }) });
     }
+
+    user.password = undefined;   
+    return res.send({ 
+      user, 
+      token: generateToken({ id: user.id }),
+     });
+    
   } catch (error) {
     console.log(error);
   }
 });
 
-module.exports = (app) => app.use("/auth", router)
+module.exports = (app) => app.use("/auth", router);
