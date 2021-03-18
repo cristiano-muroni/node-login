@@ -30,7 +30,12 @@ router.post("/registro", async (req, res) => {
 router.post("/authenticate", async (req, res) => {
   try {
     const { email, password } = req.body;
-    const user = await (await User.findOne({ email })).select("+passord");
+    const user =  await User.findOne({email})
+    console.log('user', user);
+
+   // const secretPassword = await user.select('+passord'); 
+    //console.log(secretPassword);
+   
 
     if (!user) {
       return res.status(400).send({ error: "Usuário não encontrado" });
@@ -47,4 +52,4 @@ router.post("/authenticate", async (req, res) => {
   }
 });
 
-module.exports = (app) => app.use("/auth", router);
+module.exports = (app) => app.use("/auth", router)
